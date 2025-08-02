@@ -78,7 +78,7 @@ passport.use(
             email,
             name: profile.displayName,
             picture: profile.photos?.[0].value,
-            role: Role.USER,
+            role: Role.SENDER,
             isVerified: true,
             auths: [
               {
