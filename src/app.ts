@@ -25,7 +25,14 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(cookieParser());
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "https://sendy-parcel-delivery-backend.vercel.app/",
+      "http://localhost:5173",
+    ],
+  })
+);
 app.use("/api/v1", router);
 
 app.get("/", (req: Request, res: Response) => {
