@@ -25,10 +25,8 @@ export const createUserZodSchema = z.object({
     }),
 
   roles: z
-    .array(z.enum([Role.SUPER_ADMIN, Role.ADMIN, Role.SENDER, Role.RECEIVER]), {
-      required_error: "At least one role must be provided",
-    })
-    .min(1, { message: "User must have at least one role." }),
+    .array(z.enum([Role.SUPER_ADMIN, Role.ADMIN, Role.SENDER, Role.RECEIVER]))
+    .optional(),
   phone: z
     .string({ invalid_type_error: "Phone Number must be string" })
     .regex(/^(?:\+8801\d{9}|01\d{9})$/, {

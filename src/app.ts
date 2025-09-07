@@ -37,7 +37,7 @@ app.use("/api/v1", router);
 
 app.get("/", (req: Request, res: Response) => {
   res.status(200).json({
-    messege: "hello welcome to tour management backend",
+    messege: "hello welcome to parcel management backend",
   });
 });
 

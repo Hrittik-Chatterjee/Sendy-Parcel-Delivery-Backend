@@ -9,19 +9,12 @@ import { JwtPayload } from "jsonwebtoken";
 const createUser = async (payload: Partial<IUser>) => {
   console.log("Payload received:", payload);
 
-  const { email, password, roles, ...rest } = payload;
+  const { email, password, name, ...rest } = payload;
 
   const isUserExists = await User.findOne({ email });
 
   if (isUserExists) {
     throw new AppError(httpStatus.BAD_REQUEST, "User Already Exists");
-  }
-
-  if (!Array.isArray(roles) || roles.length === 0) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "User must have at least one role"
-    );
   }
 
   const hashedPassword = await bcryptjs.hash(
@@ -33,12 +26,14 @@ const createUser = async (payload: Partial<IUser>) => {
     provider: "credentials",
     providerId: email!,
   };
+  
   const user = await User.create({
+    name,
     email,
     password: hashedPassword,
-    roles,
-    ...rest,
+    roles: [Role.SENDER, Role.RECEIVER], // Default roles for new users
     auths: authprovider,
+    ...rest,
   });
   return user;
 };
