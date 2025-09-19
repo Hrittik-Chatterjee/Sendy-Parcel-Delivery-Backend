@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Verification - Sendy</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 300;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .greeting {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .otp-section {
+            background: #f8f9fa;
+            border: 2px dashed #e9ecef;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            margin: 30px 0;
+        }
+        .otp-label {
+            font-size: 14px;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        .otp-code {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+            letter-spacing: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+        }
+        .validity {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+            color: #856404;
+        }
+        .validity-icon {
+            font-size: 18px;
+            margin-right: 8px;
+        }
+        .instructions {
+            color: #666;
+            font-size: 14px;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        .instructions ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .instructions li {
+            margin: 8px 0;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+        .footer p {
+            margin: 5px 0;
+            color: #6c757d;
+            font-size: 12px;
+        }
+        .brand {
+            color: #667eea;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .security-note {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 20px 0;
+            color: #1565c0;
+            font-size: 13px;
+        }
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                border-radius: 0;
+            }
+            .header, .content, .footer {
+                padding: 20px;
+            }
+            .otp-code {
+                font-size: 28px;
+                letter-spacing: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Sendy Parcel Delivery</h1>
+        </div>
+
+        <div class="content">
+            <div class="greeting">
+                Hello <strong><%= name %></strong>,
+            </div>
+
+            <p>We received a request to verify your account. Please use the following One-Time Password (OTP) to complete your verification:</p>
+
+            <div class="otp-section">
+                <div class="otp-label">Your Verification Code</div>
+                <div class="otp-code"><%= otp %></div>
+            </div>
+
+            <div class="validity">
+                <span class="validity-icon">⏰</span>
+                <strong>Important:</strong> This code will expire in 2 minutes for your security.
+            </div>
+
+            <div class="instructions">
+                <strong>How to use this code:</strong>
+                <ul>
+                    <li>Enter this code in the verification field on our website or app</li>
+                    <li>Do not share this code with anyone</li>
+                    <li>If you didn't request this code, please ignore this email</li>
+                </ul>
+            </div>
+
+            <div class="security-note">
+                🔒 <strong>Security Notice:</strong> Sendy will never ask you to share your OTP via email, phone, or any other method. Keep this code confidential.
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>This email was sent by <a href="#" class="brand">Sendy Parcel Delivery</a></p>
+            <p>If you have any questions, please contact our support team.</p>
+            <p>&copy; 2024 Sendy. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

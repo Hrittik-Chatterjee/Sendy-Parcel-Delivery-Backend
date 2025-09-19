@@ -25,8 +25,8 @@ export const createUserZodSchema = z.object({
     }),
 
   roles: z
-    .array(z.enum([Role.SUPER_ADMIN, Role.ADMIN, Role.SENDER, Role.RECEIVER]))
-    .optional(),
+    .array(z.enum([Role.SENDER, Role.RECEIVER]))
+    .min(1, { message: "At least one role must be selected" }),
   phone: z
     .string({ invalid_type_error: "Phone Number must be string" })
     .regex(/^(?:\+8801\d{9}|01\d{9})$/, {
@@ -70,11 +70,7 @@ export const updateUserZodSchema = z.object({
     .optional(),
 
   roles: z
-    .array(
-      z.enum(["SUPER_ADMIN", "ADMIN", "SENDER", "RECEIVER"], {
-        errorMap: () => ({ message: "Invalid role." }),
-      })
-    )
+    .array(z.enum([Role.SUPER_ADMIN, Role.ADMIN, Role.SENDER, Role.RECEIVER]))
     .optional(),
   isActive: z.enum(Object.values(IsActive) as [string]).optional(),
   isDeleted: z

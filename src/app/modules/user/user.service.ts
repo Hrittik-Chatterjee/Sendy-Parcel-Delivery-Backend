@@ -9,7 +9,7 @@ import { JwtPayload } from "jsonwebtoken";
 const createUser = async (payload: Partial<IUser>) => {
   console.log("Payload received:", payload);
 
-  const { email, password, name, ...rest } = payload;
+  const { email, password, name, roles, ...rest } = payload;
 
   const isUserExists = await User.findOne({ email });
 
@@ -26,12 +26,14 @@ const createUser = async (payload: Partial<IUser>) => {
     provider: "credentials",
     providerId: email!,
   };
-  
+
+  const userRoles = roles;
+
   const user = await User.create({
     name,
     email,
     password: hashedPassword,
-    roles: [Role.SENDER, Role.RECEIVER], // Default roles for new users
+    roles: userRoles,
     auths: authprovider,
     ...rest,
   });
