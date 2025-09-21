@@ -25,6 +25,10 @@ passport.use(
           return done("User Doesn't Exits");
         }
 
+        if (!isUserExists.isVerified) {
+          return done(null, false, { message: "Please verify your email before logging in" });
+        }
+
         const isGoogleAuthenticated = isUserExists.auths.some(
           (providerObjects) => providerObjects.provider === "google"
         );
