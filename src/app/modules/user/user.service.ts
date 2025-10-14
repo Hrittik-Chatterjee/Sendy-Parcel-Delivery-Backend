@@ -116,8 +116,21 @@ const getAllUsers = async () => {
   };
 };
 
+const getMe = async (userId: string) => {
+  const user = await User.findById(userId).select("-password");
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User Not Found");
+  }
+
+  return {
+    data: user,
+  };
+};
+
 export const UserServices = {
   createUser,
   getAllUsers,
   updateUser,
+  getMe,
 };

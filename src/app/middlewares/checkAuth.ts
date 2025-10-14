@@ -12,7 +12,8 @@ export const checkAuth =
   (...authRoles: string[]) =>
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const accessToken = req.headers.authorization;
+      // Try to get token from cookies first, then fallback to authorization header
+      const accessToken = req.cookies.accessToken || req.headers.authorization;
 
       if (!accessToken) {
         throw new AppError(401, "No token recieved");
