@@ -13,7 +13,7 @@ import { router } from "./app/routes";
 import { envVars } from "./app/config/env";
 
 const app = express();
-
+console.log("test")
 app.use(
   expressSession({
     secret: envVars.EXPRESS_SESSION_SECRET,
