@@ -26,4 +26,6 @@ export interface IParcel {
   currentStatus: IStatusLog["status"];
   statusLogs: IStatusLog[];
   isBlocked?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

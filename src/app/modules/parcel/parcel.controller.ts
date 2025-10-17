@@ -117,10 +117,27 @@ const getParcelStatusLogs = catchAsync(
     });
   }
 );
+
+const trackParcel = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { trackingId } = req.params;
+
+    const result = await ParcelServices.trackParcelByTrackingId(trackingId);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Parcel tracked successfully",
+      data: result,
+    });
+  }
+);
+
 export const ParcelController = {
   createParcel,
   updateParcel,
   getAllParcels,
   getMyParcels,
   getParcelStatusLogs,
+  trackParcel,
 };

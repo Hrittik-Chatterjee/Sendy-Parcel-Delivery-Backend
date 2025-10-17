@@ -14,10 +14,9 @@ const createParcel = async (payload: Partial<IParcel>) => {
   if (existingParcel) {
     throw new Error("A parcel already exists");
   }
-  const systemUserId = new Types.ObjectId("688b9d551a098dbd0df24a3e");
   const initialStatusLog: IStatusLog = {
     status: "Requested",
-    updatedBy: systemUserId, // who created the parcel
+    updatedBy: payload.senderId,
     timestamp: new Date(),
     location: payload.pickupAddress || "",
     note: "Parcel created",
@@ -142,10 +141,36 @@ const getParcelStatusLogs = async (parcelId: string) => {
 
   return parcel;
 };
+
+const trackParcelByTrackingId = async (trackingId: string) => {
+  const parcel = await Parcel.findOne({ trackingId })
+    .populate("senderId", "name email phone")
+    .populate("receiverId", "name email phone")
+    .select("-__v");
+
+  if (!parcel) {
+    throw new AppError(httpStatus.NOT_FOUND, "Parcel not found with this tracking ID");
+  }
+
+  // Return only public information
+  return {
+    trackingId: parcel.trackingId,
+    currentStatus: parcel.currentStatus,
+    pickupAddress: parcel.pickupAddress,
+    deliveryAddress: parcel.deliveryAddress,
+    weight: parcel.weight,
+    fee: parcel.fee,
+    statusLogs: parcel.statusLogs,
+    createdAt: parcel.createdAt,
+    updatedAt: parcel.updatedAt,
+  };
+};
+
 export const ParcelServices = {
   createParcel,
   updateParcel,
   getAllParcels,
   getMyParcels,
   getParcelStatusLogs,
+  trackParcelByTrackingId,
 };
