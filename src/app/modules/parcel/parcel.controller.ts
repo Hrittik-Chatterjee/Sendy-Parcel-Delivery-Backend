@@ -133,6 +133,40 @@ const trackParcel = catchAsync(
   }
 );
 
+const confirmDelivery = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const verifiedToken = req.user as JwtPayload;
+    const userId = verifiedToken.userId;
+
+    const result = await ParcelServices.confirmDelivery(id, userId);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Delivery confirmed successfully",
+      data: result,
+    });
+  }
+);
+
+const cancelDelivery = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const verifiedToken = req.user as JwtPayload;
+    const userId = verifiedToken.userId;
+
+    const result = await ParcelServices.cancelDelivery(id, userId);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Delivery Has Been Cancelled Successfully",
+      data: result,
+    });
+  }
+);
+
 export const ParcelController = {
   createParcel,
   updateParcel,
@@ -140,4 +174,6 @@ export const ParcelController = {
   getMyParcels,
   getParcelStatusLogs,
   trackParcel,
+  confirmDelivery,
+  cancelDelivery,
 };

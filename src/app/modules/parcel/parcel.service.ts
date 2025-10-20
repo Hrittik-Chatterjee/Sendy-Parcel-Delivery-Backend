@@ -149,7 +149,10 @@ const trackParcelByTrackingId = async (trackingId: string) => {
     .select("-__v");
 
   if (!parcel) {
-    throw new AppError(httpStatus.NOT_FOUND, "Parcel not found with this tracking ID");
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Parcel not found with this tracking ID"
+    );
   }
 
   // Return only public information
@@ -166,6 +169,107 @@ const trackParcelByTrackingId = async (trackingId: string) => {
   };
 };
 
+const confirmDelivery = async (parcelId: string, userId: string) => {
+  const parcel = await Parcel.findById(parcelId);
+
+  if (!parcel) {
+    throw new AppError(httpStatus.NOT_FOUND, "Parcel not found");
+  }
+
+  // Check if the user is the receiver
+  if (parcel.receiverId.toString() !== userId) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "Only the receiver can confirm delivery"
+    );
+  }
+
+  const validStatuses = ["Dispatched", "In Transit"];
+
+  if (
+    parcel.currentStatus === "Cancelled" ||
+    parcel.currentStatus === "Delivered" ||
+    !validStatuses.includes(parcel.currentStatus)
+  ) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `Cannot confirm delivery while parcel is ${parcel.currentStatus.toLowerCase()}`
+    );
+  }
+
+  // Update parcel status to Delivered
+  const updatedParcel = await Parcel.findByIdAndUpdate(
+    parcelId,
+    {
+      currentStatus: "Delivered",
+      $push: {
+        statusLogs: {
+          status: "Delivered",
+          timestamp: new Date(),
+          updatedBy: new Types.ObjectId(userId),
+          note: "Delivery confirmed by receiver",
+        },
+      },
+    },
+    { new: true, runValidators: true }
+  )
+    .populate("senderId", "name email")
+    .populate("receiverId", "name email");
+
+  return updatedParcel;
+};
+
+const cancelDelivery = async (parcelId: string, userId: string) => {
+  const parcel = await Parcel.findById(parcelId);
+
+  if (!parcel) {
+    throw new AppError(httpStatus.NOT_FOUND, "Parcel not found");
+  }
+
+  // ✅ Only sender can cancel
+  if (parcel.senderId.toString() !== userId) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "Only the sender can cancel this parcel"
+    );
+  }
+
+  // ✅ Cannot cancel if already dispatched, in transit, or delivered
+  const nonCancellableStatuses = ["Dispatched", "In Transit", "Delivered"];
+  if (nonCancellableStatuses.includes(parcel.currentStatus)) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `Cannot cancel parcel after it has been ${parcel.currentStatus.toLowerCase()}`
+    );
+  }
+
+  // ✅ Cannot cancel if already cancelled
+  if (parcel.currentStatus === "Cancelled") {
+    throw new AppError(httpStatus.BAD_REQUEST, "Parcel is already cancelled");
+  }
+
+  // ✅ Update status to Cancelled
+  const updatedParcel = await Parcel.findByIdAndUpdate(
+    parcelId,
+    {
+      currentStatus: "Cancelled",
+      $push: {
+        statusLogs: {
+          status: "Cancelled",
+          timestamp: new Date(),
+          updatedBy: new Types.ObjectId(userId),
+          note: "Parcel cancelled by sender",
+        },
+      },
+    },
+    { new: true, runValidators: true }
+  )
+    .populate("senderId", "name email")
+    .populate("receiverId", "name email");
+
+  return updatedParcel;
+};
+
 export const ParcelServices = {
   createParcel,
   updateParcel,
@@ -173,4 +277,6 @@ export const ParcelServices = {
   getMyParcels,
   getParcelStatusLogs,
   trackParcelByTrackingId,
+  confirmDelivery,
+  cancelDelivery,
 };

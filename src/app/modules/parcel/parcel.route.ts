@@ -39,6 +39,16 @@ router.get(
   ParcelController.getParcelStatusLogs
 );
 router.patch(
+  "/:id/confirm-delivery",
+  checkAuth(...Object.values(Role)),
+  ParcelController.confirmDelivery
+);
+router.patch(
+  "/:id/cancel-delivery",
+  checkAuth(...Object.values(Role)),
+  ParcelController.confirmDelivery
+);
+router.patch(
   "/:id",
   validateRequest(updateParcelZodSchema),
   checkAuth(...Object.values(Role)),
