@@ -46,7 +46,7 @@ router.patch(
 router.patch(
   "/:id/cancel-delivery",
   checkAuth(...Object.values(Role)),
-  ParcelController.confirmDelivery
+  ParcelController.cancelDelivery
 );
 router.patch(
   "/:id",
