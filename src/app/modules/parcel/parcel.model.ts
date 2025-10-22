@@ -51,38 +51,6 @@ parcelSchema.pre("save", function (next) {
   next();
 });
 
-// parcelSchema.pre("findOneAndUpdate", async function (next) {
-//   const update = this.getUpdate();
-
-//   if (update && !Array.isArray(update)) {
-//     const typedUpdate = update as UpdateQuery<Partial<IParcel>>;
-
-//     if (
-//       typedUpdate.currentStatus &&
-//       typedUpdate.currentStatus !== "Requested"
-//     ) {
-//       try {
-//         const parcel = await this.model.findOne(this.getQuery());
-
-//         if (parcel.currentStatus === "Requested") {
-//           const receiver = await User.findById(parcel.receiverId);
-//           if (receiver) {
-//             const receiverRole = "RECEIVER" as Role;
-//             if (!receiver.roles.includes(receiverRole)) {
-//               receiver.roles.push(receiverRole);
-//               await receiver.save();
-//             }
-//           }
-//         }
-//       } catch (error: any) {
-//         return next(error);
-//       }
-//     }
-//   }
-
-//   next();
-// });
-
 parcelSchema.pre("findOneAndUpdate", async function (next) {
   const update = this.getUpdate();
 
@@ -96,7 +64,6 @@ parcelSchema.pre("findOneAndUpdate", async function (next) {
       try {
         const parcel = await this.model.findOne(this.getQuery());
 
-        // Only add new status log if currentStatus is changing
         if (parcel.currentStatus !== typedUpdate.currentStatus) {
           const receiver = await User.findById(parcel.receiverId);
           if (receiver) {
@@ -107,16 +74,14 @@ parcelSchema.pre("findOneAndUpdate", async function (next) {
             }
           }
 
-          // Add a new status log entry
           const newLog = {
             status: typedUpdate.currentStatus,
             timestamp: new Date(),
-            updatedBy: typedUpdate.updatedBy, // you must send this in your update payload
+            updatedBy: typedUpdate.updatedBy,
             location: typedUpdate.location || parcel.deliveryAddress,
             note: `Status changed to ${typedUpdate.currentStatus}`,
           };
 
-          // Use $push to add the new log to statusLogs
           this.setUpdate({
             ...typedUpdate,
             $push: {

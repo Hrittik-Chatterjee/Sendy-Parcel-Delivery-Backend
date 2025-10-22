@@ -60,11 +60,6 @@ const getMe = catchAsync(
     const decodedToken = req.user as JwtPayload;
     const user = await UserServices.getMe(decodedToken.userId);
 
-    // res.status(httpStatus.OK).json({
-    //     success: true,
-    //     message: "All Users Retrieved Successfully",
-    //     data: users
-    // })
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.CREATED,

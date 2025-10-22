@@ -14,7 +14,6 @@ router.patch("/test", (req, res) => {
   res.send("PATCH working");
 });
 
-// Public route - no authentication required
 router.get("/track/:trackingId", ParcelController.trackParcel);
 
 router.post(

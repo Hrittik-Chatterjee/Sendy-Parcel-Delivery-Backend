@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { IParcel, IStatusLog } from "./parcel.interface";
 import { Parcel } from "./parcel.model";
-import { User } from "../user/user.model";
+
 import AppError from "../../errorHelpers/AppError";
 import httpStatus from "http-status-codes";
 import { JwtPayload } from "jsonwebtoken";
@@ -155,7 +155,6 @@ const trackParcelByTrackingId = async (trackingId: string) => {
     );
   }
 
-  // Return only public information
   return {
     trackingId: parcel.trackingId,
     currentStatus: parcel.currentStatus,
@@ -176,7 +175,6 @@ const confirmDelivery = async (parcelId: string, userId: string) => {
     throw new AppError(httpStatus.NOT_FOUND, "Parcel not found");
   }
 
-  // Check if the user is the receiver
   if (parcel.receiverId.toString() !== userId) {
     throw new AppError(
       httpStatus.FORBIDDEN,
@@ -184,20 +182,13 @@ const confirmDelivery = async (parcelId: string, userId: string) => {
     );
   }
 
-  const validStatuses = ["Dispatched", "In Transit"];
-
-  if (
-    parcel.currentStatus === "Cancelled" ||
-    parcel.currentStatus === "Delivered" ||
-    !validStatuses.includes(parcel.currentStatus)
-  ) {
+  if (parcel.currentStatus !== "In Transit") {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      `Cannot confirm delivery while parcel is ${parcel.currentStatus.toLowerCase()}`
+      `Cannot confirm delivery. Parcel must be "In Transit" but current status is "${parcel.currentStatus}"`
     );
   }
 
-  // Update parcel status to Delivered
   const updatedParcel = await Parcel.findByIdAndUpdate(
     parcelId,
     {
@@ -226,7 +217,6 @@ const cancelDelivery = async (parcelId: string, userId: string) => {
     throw new AppError(httpStatus.NOT_FOUND, "Parcel not found");
   }
 
-  // ✅ Only sender can cancel
   if (parcel.senderId.toString() !== userId) {
     throw new AppError(
       httpStatus.FORBIDDEN,
@@ -234,7 +224,6 @@ const cancelDelivery = async (parcelId: string, userId: string) => {
     );
   }
 
-  // ✅ Cannot cancel if already dispatched, in transit, or delivered
   const nonCancellableStatuses = ["Dispatched", "In Transit", "Delivered"];
   if (nonCancellableStatuses.includes(parcel.currentStatus)) {
     throw new AppError(
@@ -243,12 +232,10 @@ const cancelDelivery = async (parcelId: string, userId: string) => {
     );
   }
 
-  // ✅ Cannot cancel if already cancelled
   if (parcel.currentStatus === "Cancelled") {
     throw new AppError(httpStatus.BAD_REQUEST, "Parcel is already cancelled");
   }
 
-  // ✅ Update status to Cancelled
   const updatedParcel = await Parcel.findByIdAndUpdate(
     parcelId,
     {
