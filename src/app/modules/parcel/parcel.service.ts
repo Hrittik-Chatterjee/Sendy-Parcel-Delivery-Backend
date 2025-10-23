@@ -44,13 +44,8 @@ const updateParcel = async (
     tokenRoles.includes(Role.ADMIN) || tokenRoles.includes(Role.SUPER_ADMIN);
   const isSender = tokenRoles.includes(Role.SENDER);
   const isReceiver = tokenRoles.includes(Role.RECEIVER);
-  if (isReceiver) {
-    throw new AppError(
-      httpStatus.FORBIDDEN,
-      "Receivers are not allowed to update parcel"
-    );
-  }
 
+  // Admin/Super Admin has priority - they can update regardless of other roles
   if (isAdmin) {
     const updatedParcel = await Parcel.findByIdAndUpdate(parcelId, payload, {
       new: true,
@@ -93,6 +88,14 @@ const updateParcel = async (
       runValidators: true,
     });
     return updatedParcel;
+  }
+
+  // Receivers (who are not admins) cannot update parcels
+  if (isReceiver) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "Receivers are not allowed to update parcel"
+    );
   }
 
   throw new AppError(
