@@ -3,7 +3,7 @@ import AppError from "../../errorHelpers/AppError";
 import { User } from "../user/user.model";
 import httpStatus from "http-status-codes";
 import bcryptjs from "bcryptjs";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import { JwtPayload } from "jsonwebtoken";
 
 import { envVars } from "../../config/env";
 import { createNewAccessTokenWithRefreshToken } from "../../utils/userToken";
