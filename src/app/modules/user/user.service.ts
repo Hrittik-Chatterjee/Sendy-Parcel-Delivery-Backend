@@ -105,13 +105,28 @@ const updateUser = async (
   return newUpdatedUser;
 };
 
-const getAllUsers = async () => {
-  const users = await User.find({});
+const getAllUsers = async (query: Record<string, any>) => {
+  // Pagination
+  const page = parseInt(query.page) || 1;
+  const limit = parseInt(query.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  const users = await User.find({})
+    .select("-password") // Don't return passwords
+    .skip(skip)
+    .limit(limit)
+    .sort({ createdAt: -1 }); // Most recent first
+
   const totalUsers = await User.countDocuments();
+  const totalPages = Math.ceil(totalUsers / limit);
+
   return {
     data: users,
     meta: {
       total: totalUsers,
+      page,
+      limit,
+      totalPages,
     },
   };
 };

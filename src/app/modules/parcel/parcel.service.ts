@@ -111,12 +111,26 @@ const getAllParcels = async (query: Record<string, any>) => {
     filter.currentStatus = query.currentStatus;
   }
 
-  const parcels = await Parcel.find(filter);
+  // Pagination
+  const page = parseInt(query.page) || 1;
+  const limit = parseInt(query.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  const parcels = await Parcel.find(filter)
+    .skip(skip)
+    .limit(limit)
+    .sort({ createdAt: -1 }); // Most recent first
+
   const totalParcels = await Parcel.countDocuments(filter);
+  const totalPages = Math.ceil(totalParcels / limit);
+
   return {
     data: parcels,
     meta: {
       total: totalParcels,
+      page,
+      limit,
+      totalPages,
     },
   };
 };
