@@ -13,7 +13,7 @@ import { router } from "./app/routes";
 import { envVars } from "./app/config/env";
 
 const app = express();
-console.log("test")
+console.log("test");
 app.use(
   expressSession({
     secret: envVars.EXPRESS_SESSION_SECRET,
@@ -27,7 +27,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: ["http://localhost:3000", "https://sendy-client.vercel.app"],
     credentials: true,
   })
 );
