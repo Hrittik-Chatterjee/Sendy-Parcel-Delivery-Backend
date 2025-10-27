@@ -64,7 +64,7 @@ parcelSchema.pre("findOneAndUpdate", async function (next) {
       try {
         const parcel = await this.model.findOne(this.getQuery());
 
-        if (parcel && parcel.currentStatus !== typedUpdate.currentStatus) {
+        if (parcel.currentStatus !== typedUpdate.currentStatus) {
           const receiver = await User.findById(parcel.receiverId);
           if (receiver) {
             const receiverRole = "RECEIVER" as Role;
@@ -74,31 +74,20 @@ parcelSchema.pre("findOneAndUpdate", async function (next) {
             }
           }
 
-          if (!typedUpdate.statusLogs) {
-            const newLog = {
-              status: typedUpdate.currentStatus,
-              timestamp: new Date(),
-              updatedBy: typedUpdate.updatedBy,
-              location: typedUpdate.location || parcel.deliveryAddress,
-              note: `Status changed to ${typedUpdate.currentStatus}`,
-            };
+          const newLog = {
+            status: typedUpdate.currentStatus,
+            timestamp: new Date(),
+            updatedBy: typedUpdate.updatedBy,
+            location: typedUpdate.location || parcel.deliveryAddress,
+            note: `Status changed to ${typedUpdate.currentStatus}`,
+          };
 
-            this.setUpdate({
-              ...typedUpdate,
-              $push: {
-                statusLogs: newLog,
-              },
-            });
-          } else {
-            const updateObj = { ...typedUpdate };
-            delete (updateObj as any).$push;
-
-            this.setUpdate({
-              $set: {
-                ...updateObj,
-              },
-            });
-          }
+          this.setUpdate({
+            ...typedUpdate,
+            $push: {
+              statusLogs: newLog,
+            },
+          });
         }
       } catch (error: any) {
         return next(error);
