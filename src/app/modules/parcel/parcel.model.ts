@@ -74,20 +74,22 @@ parcelSchema.pre("findOneAndUpdate", async function (next) {
             }
           }
 
-          const newLog = {
-            status: typedUpdate.currentStatus,
-            timestamp: new Date(),
-            updatedBy: typedUpdate.updatedBy,
-            location: typedUpdate.location || parcel.deliveryAddress,
-            note: `Status changed to ${typedUpdate.currentStatus}`,
-          };
+          if (!typedUpdate.statusLogs) {
+            const newLog = {
+              status: typedUpdate.currentStatus,
+              timestamp: new Date(),
+              updatedBy: typedUpdate.updatedBy,
+              location: typedUpdate.location || parcel.deliveryAddress,
+              note: `Status changed to ${typedUpdate.currentStatus}`,
+            };
 
-          this.setUpdate({
-            ...typedUpdate,
-            $push: {
-              statusLogs: newLog,
-            },
-          });
+            this.setUpdate({
+              ...typedUpdate,
+              $push: {
+                statusLogs: newLog,
+              },
+            });
+          }
         }
       } catch (error: any) {
         return next(error);
