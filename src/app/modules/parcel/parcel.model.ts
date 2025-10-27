@@ -64,7 +64,8 @@ parcelSchema.pre("findOneAndUpdate", async function (next) {
       try {
         const parcel = await this.model.findOne(this.getQuery());
 
-        if (parcel.currentStatus !== typedUpdate.currentStatus) {
+        if (parcel && parcel.currentStatus !== typedUpdate.currentStatus) {
+          // Assign receiver role when status changes
           const receiver = await User.findById(parcel.receiverId);
           if (receiver) {
             const receiverRole = "RECEIVER" as Role;
@@ -74,7 +75,9 @@ parcelSchema.pre("findOneAndUpdate", async function (next) {
             }
           }
 
+          // Check if statusLogs array is provided in the update
           if (!typedUpdate.statusLogs) {
+            // If not provided, auto-generate status log entry
             const newLog = {
               status: typedUpdate.currentStatus,
               timestamp: new Date(),
@@ -87,6 +90,17 @@ parcelSchema.pre("findOneAndUpdate", async function (next) {
               ...typedUpdate,
               $push: {
                 statusLogs: newLog,
+              },
+            });
+          } else {
+            // If statusLogs is provided, ensure we use $set to replace it
+            // Remove any conflicting $push operations
+            const updateObj = { ...typedUpdate };
+            delete (updateObj as any).$push;
+
+            this.setUpdate({
+              $set: {
+                ...updateObj,
               },
             });
           }
