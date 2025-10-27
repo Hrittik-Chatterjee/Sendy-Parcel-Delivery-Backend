@@ -69,16 +69,55 @@ const getNewAccessToken = catchAsync(
 
 const logOut = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
+    // Logout from passport first
+    await new Promise<void>((resolve, reject) => {
+      req.logout((err) => {
+        if (err) {
+          console.error("Passport logout error:", err);
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+
+    // Destroy session
+    await new Promise<void>((resolve, reject) => {
+      if (req.session) {
+        req.session.destroy((err) => {
+          if (err) {
+            console.error("Session destruction error:", err);
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      } else {
+        resolve();
+      }
+    });
+
+    // Clear auth cookies with matching settings
     res.clearCookie("accessToken", {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: true,
+      sameSite: "none",
+      path: "/",
     });
 
     res.clearCookie("refreshToken", {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: true,
+      sameSite: "none",
+      path: "/",
+    });
+
+    // Clear session cookie if it exists
+    res.clearCookie("connect.sid", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      path: "/",
     });
 
     sendResponse(res, {
