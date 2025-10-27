@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node ./dist/server.js",
     "dev": "ts-node-dev --respawn --transpile-only  ./src/server.ts",
-    "build": "tsc",
+    "build": "tsc && xcopy /E /I /Y src\\app\\utils\\templates dist\\app\\utils\\templates",
     "lint": "npx eslint ./src",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
